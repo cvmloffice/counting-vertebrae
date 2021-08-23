@@ -38,6 +38,31 @@ def _read_bounding_box(image_path, bb_rel_path=None):
     # Return labels and bbs separately
     return bb[:,0], bb[:,1:]
 
+def _scale_bb(bbs, width, height):
+    scale = np.array((width, height, width, height), dtype=float)
+    bbs_scaled = []
+    for bb in bbs:
+        x_start = bb[0] - bb[2]/2
+        y_start = bb[1] - bb[3]/2
+        x_end = x_start + bb[2]
+        y_end = y_start + bb[3]
+        bbs_scaled.append(np.array((x_start, y_start, x_end, y_end) * scale, dtype=int))
+    return bbs_scaled
+
+
+def _plot_rects(im, bb1, bb2, ax=None):
+    """Plot rectangles of bounding boxes on image"""
+    if ax is None:
+        ax=plt.gca()
+    ax.imshow(im)
+
+    height, width = im.shape[0:2]
+    for bb in _scale_bb(bb1, width, height):
+        ax.plot([bb[0], bb[0], bb[2], bb[2], bb[0]],[bb[1],bb[3], bb[3], bb[1], bb[1]], 'r')
+    for bb in _scale_bb(bb2, width, height):
+        ax.plot([bb[0], bb[0], bb[2], bb[2], bb[0]],[bb[1],bb[3], bb[3], bb[1], bb[1]], 'b')
+    return ax
+        
 
 def _compute_mean_average_precision(width, height, bb1, bb2):
     """Compute the mean average precision given bounding box and im size"""
@@ -93,6 +118,19 @@ def main():
     parser.add_argument("-o", dest="output_path", default="./mean_average_precision.csv",
         help="Path to save output"
     )
+    parser.add_argument("-m", "--montage", dest="montage", 
+        default=False, action='store_true',
+        help="Create montage of overlay of groundtruth and predictions"
+    )
+    parser.add_argument("--ncols", dest="ncols", type=int, default=3,
+        help="Number of columns for montage"
+    )
+    parser.add_argument("--gt-colour", dest="gt_color", default="r",
+        help="Color for ground truth rectangles"
+    )
+    parser.add_argument("--pred-colour", dest="pred_color", default="g",
+        help="Color for predicted rectangles"
+    )
 
     args = parser.parse_args()
     input_path = args.input_path
@@ -103,9 +141,17 @@ def main():
     with open(input_path, "rt") as fid:
         images_to_process = [i.strip() for i in fid.readlines()]
     
+    n_images = len(images_to_process)
+    print(f"N images = {n_images}")
+
+    if args.montage:
+        ncols = n_images if args.ncols > n_images else args.ncols
+        nrows = int(np.ceil(n_images/ncols))
+        fig, axs = plt.subplots(nrows, ncols)
+
     # Get mAP for each image
     mean_average_precision = ""
-    for image_path in images_to_process:
+    for i, image_path in enumerate(images_to_process, start=1):
         # Open image and get width/height
         im = plt.imread(image_path)
         height, width = im.shape[0:2]
@@ -115,6 +161,16 @@ def main():
         labels_pred, bb_pred = _read_bounding_box(image_path, pred_path)
         m_ap = _compute_mean_average_precision(width, height, bb_gt, bb_pred)
         mean_average_precision += f"{image_path},{m_ap}\n"
+
+        # If necessary plot gt and prediction
+        if args.montage:
+            row = int(np.floor(i/ncols))
+            col = i%ncols
+            print(axs)
+            if nrows < 2:
+                _plot_rects(im, bb_gt, bb_pred, axs[col])
+            else:
+                _plot_rects(im, bb_gt, bb_pred, axs[row][col])
     
     # Write out processed values
     output_path = args.output_path
@@ -122,7 +178,12 @@ def main():
     with open(output_path, "wt") as fid:
         fid.writelines(mean_average_precision)
 
-
+    # Compute montage if required
+    if args.montage:
+        montage_path = os.path.splitext(output_path)[0] + ".png"
+        plt.savefig(montage_path)
+        
+        
 if __name__ == "__main__":
     main()
     
