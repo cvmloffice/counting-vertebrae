@@ -1,0 +1,10 @@
+/nfs/nobackup/spot/machine_learning/impc_mouse_xrays/yolo_object_detection/darknet/vertebrae/images/102673.png
+/nfs/nobackup/spot/machine_learning/impc_mouse_xrays/yolo_object_detection/darknet/vertebrae/images/142015.png
+/nfs/nobackup/spot/machine_learning/impc_mouse_xrays/yolo_object_detection/darknet/vertebrae/images/148381.png
+/nfs/nobackup/spot/machine_learning/impc_mouse_xrays/yolo_object_detection/darknet/vertebrae/images/153983.png
+/nfs/nobackup/spot/machine_learning/impc_mouse_xrays/yolo_object_detection/darknet/vertebrae/images/159313.png
+/nfs/nobackup/spot/machine_learning/impc_mouse_xrays/yolo_object_detection/darknet/vertebrae/images/347805.png
+/nfs/nobackup/spot/machine_learning/impc_mouse_xrays/yolo_object_detection/darknet/vertebrae/images/349913.png
+/nfs/nobackup/spot/machine_learning/impc_mouse_xrays/yolo_object_detection/darknet/vertebrae/images/360729.png
+/nfs/nobackup/spot/machine_learning/impc_mouse_xrays/yolo_object_detection/darknet/vertebrae/images/371935.png
+/nfs/nobackup/spot/machine_learning/impc_mouse_xrays/yolo_object_detection/darknet/vertebrae/images/377563.png

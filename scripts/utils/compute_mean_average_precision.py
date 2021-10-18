@@ -11,6 +11,7 @@
 # Assume python > 3.6
 
 import os
+from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
@@ -125,6 +126,9 @@ def main():
     parser.add_argument("--ncols", dest="ncols", type=int, default=3,
         help="Number of columns for montage"
     )
+    parser.add_argument("--nrows", dest="nrows", type=int, default="6",
+        help="Maximum number of rows per page"
+    )
     parser.add_argument("--gt-colour", dest="gt_color", default="r",
         help="Color for ground truth rectangles"
     )
@@ -145,13 +149,17 @@ def main():
     print(f"N images = {n_images}")
 
     if args.montage:
-        ncols = n_images if args.ncols > n_images else args.ncols
-        nrows = int(np.ceil(n_images/ncols))
-        fig, axs = plt.subplots(nrows, ncols)
+        ncols = int(np.min((n_images, args.ncols)))
+        #nrows = int(np.ceil(n_images/ncols))
+        nrows = args.nrows
+        fig, axs = plt.subplots(nrows, ncols, figsize=(7,9),
+                                subplot_kw={'xticks': [], 'yticks': []})
+        n_per_page = ncols * nrows
+        # Take away 1 because of zero offset
 
     # Get mAP for each image
     mean_average_precision = ""
-    for i, image_path in enumerate(images_to_process, start=1):
+    for i, image_path in enumerate(images_to_process, start=0):
         # Open image and get width/height
         im = plt.imread(image_path)
         height, width = im.shape[0:2]
@@ -166,11 +174,16 @@ def main():
         if args.montage:
             row = int(np.floor(i/ncols))
             col = i%ncols
-            print(axs)
+            print(f"row={row}, col={col}")
             if nrows < 2:
-                _plot_rects(im, bb_gt, bb_pred, axs[col])
+                ax = axs[col]
             else:
-                _plot_rects(im, bb_gt, bb_pred, axs[row][col])
+                ax = axs[row][col]
+            _plot_rects(im, bb_gt, bb_pred, ax)
+
+            image_name = Path(image_path).name
+            ax.set_title(f"{image_name} - {m_ap:.2f}")
+            
     
     # Write out processed values
     output_path = args.output_path
