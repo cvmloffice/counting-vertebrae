@@ -1,0 +1,29 @@
+steps:
+# Build the container image
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/counting-vertebrae-003/vertebrae-counter', '.']
+# Push the container image to Container Registry
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/counting-vertebrae-003/vertebrae-counter']
+# Deploy container image to Cloud Run
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args: 
+    - 'run'
+    - 'deploy' 
+    - 'vertebrae-counter'
+    - '--image'
+    - 'gcr.io/counting-vertebrae-003/vertebrae-counter'
+    - '--region'
+    - 'us-central1'
+    - '--memory'
+    - '8Gi'
+    - '--cpu'
+    - '4'
+    - '--allow-unauthenticated'
+    - '--min-instances'
+    - '1'
+    - '--timeout'
+    - '300'
+images:
+- gcr.io/counting-vertebrae-003/vertebrae-counter
