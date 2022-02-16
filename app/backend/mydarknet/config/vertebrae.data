@@ -1,0 +1,6 @@
+classes= 1
+train  = /nfs/nobackup/spot/machine_learning/impc_mouse_xrays/yolo_object_detection/darknet/vertebrae/train_10.txt
+valid  = /nfs/nobackup/spot/machine_learning/impc_mouse_xrays/yolo_object_detection/darknet/vertebrae/valid_02.txt
+names = mydarknet/config/vertebrae.names
+backup = /nfs/nobackup/spot/machine_learning/impc_mouse_xrays/yolo_object_detection/darknet/vertebrae/yolo_weights/
+#eval=vertebrae
