@@ -1,0 +1,25 @@
+version: "2"
+
+services:
+  backend:
+    build:
+      context: ./app/backend/
+      dockerfile: ./compose/local/Dockerfile.local
+
+    ports:
+      - "8001:8000"
+    env_file:
+      - ./app/backend/.env
+
+    command: ["./start.sh"]
+
+  frontend:
+    build:
+      context: ./app/frontend/
+      dockerfile: Dockerfile.local
+    ports:
+      - "3000:3000"
+    volumes:
+      - /app/node_modules
+      - ./app/frontend:/app
+    command: ["yarn", "start"]
